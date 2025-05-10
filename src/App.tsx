@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import HomePage from './pages/Home';
+import HomePage from './pages/Home/index';
 import CategoryPage from './pages/Category';
 import MortgageCalculatorPage from './pages/tools/MortgageCalculator';
 import NotFoundPage from './pages/NotFound';

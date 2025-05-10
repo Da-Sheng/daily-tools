@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Card, Divider, Row, Col, Spin } from 'antd';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import {
   BankOutlined,
   SwapOutlined,
@@ -11,7 +11,7 @@ import {
   CalculatorOutlined,
   KeyOutlined,
 } from '@ant-design/icons';
-import { useToolsData } from '../../api/hooks/useToolsData';
+import { useToolsData } from '../api/hooks/useToolsData';
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
@@ -44,7 +44,7 @@ const HomePage: React.FC = () => {
   const { getCategories, getTools } = useToolsData();
   const { categories, loading: categoriesLoading, error: categoriesError } = getCategories();
   const { tools, loading: toolsLoading, error: toolsError } = getTools();
-
+  console.log('categories', categories);
   // 加载状态处理
   if (categoriesLoading || toolsLoading) {
     return (
@@ -64,6 +64,7 @@ const HomePage: React.FC = () => {
       </div>
     );
   }
+  console.log('categories', categories);
 
   return (
     <div className="home-page">
@@ -77,7 +78,7 @@ const HomePage: React.FC = () => {
         {categories &&
           categories.map(category => (
             <Col xs={24} sm={12} md={8} lg={6} key={category.id}>
-              <Link to={`/category/${category.id}`}>
+              <Link href={`/category/${category.id}`}>
                 <Card
                   hoverable
                   style={{ height: '100%' }}
@@ -106,7 +107,7 @@ const HomePage: React.FC = () => {
         {tools &&
           tools.slice(0, 4).map(tool => (
             <Col xs={24} sm={12} md={8} lg={6} key={tool.id}>
-              <Link to={tool.path}>
+              <Link href={tool.path}>
                 <Card
                   hoverable
                   style={{ height: '100%' }}

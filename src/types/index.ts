@@ -14,6 +14,7 @@ export interface ToolItem {
   icon: string;
   path: string;
   categoryId: string;
+  category?: ToolCategory;
 }
 
 // 房贷计算结果
