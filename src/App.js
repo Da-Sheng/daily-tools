@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>每日工具 - 房贷计算器</h1>
+        <h1>日常工具箱</h1>
       </header>
       <main>
         <MortgageCalculator />
@@ -17,4 +17,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

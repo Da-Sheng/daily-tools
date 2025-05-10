@@ -67,7 +67,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="home-page">
-      <Title level={2}>欢迎使用每日工具箱</Title>
+      <Title level={2}>欢迎使用日常工具箱</Title>
       <Paragraph>
         这里提供各种实用工具，让你的日常工作和生活更加便捷。选择下方的工具分类或直接进入你需要的工具。
       </Paragraph>

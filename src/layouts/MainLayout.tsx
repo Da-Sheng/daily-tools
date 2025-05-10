@@ -52,7 +52,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             overflow: 'hidden',
           }}
         >
-          {!collapsed && '每日工具箱'}
+          {!collapsed && '日常工具箱'}
           {collapsed && 'DT'}
         </div>
         <Menu
@@ -115,7 +115,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             style: { fontSize: '18px', padding: '0 24px', cursor: 'pointer' },
           })}
           <Title level={4} style={{ margin: 0 }}>
-            Daily Tools | 每日工具
+            Daily Tools | 日常工具
           </Title>
         </Header>
         <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
@@ -130,7 +130,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>每日工具 ©{new Date().getFullYear()} 创建</Footer>
+        <Footer style={{ textAlign: 'center' }}>日常工具 ©{new Date().getFullYear()} 创建</Footer>
       </Layout>
     </Layout>
   );
