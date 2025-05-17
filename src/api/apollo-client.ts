@@ -8,6 +8,7 @@ import {
   ErrorPolicy,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { GRAPHQL_URL } from './config';
 
 // 错误处理链接
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -21,7 +22,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // GraphQL链接配置
 const httpLink = new HttpLink({
-  uri: 'https://api.nizbarkwt.online/graphql',
+  uri: GRAPHQL_URL,
 });
 
 // 创建Apollo客户端实例

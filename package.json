@@ -4,7 +4,7 @@
   "description": "日常实用工具集合",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --open --port 3001",
+    "start": "cross-env NODE_ENV=development webpack serve --open --port 3001",
     "build": "cross-env NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:watch": "jest --watch",
@@ -48,6 +48,7 @@
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
     "micro": "^10.0.1",
+    "next": "^15.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
