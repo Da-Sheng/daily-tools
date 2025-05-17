@@ -10,6 +10,10 @@ import DateCalculatorPage from './pages/tools/DateCalculator';
 import RandomGeneratorPage from './pages/tools/RandomGenerator';
 import NotFoundPage from './pages/NotFound';
 
+// 导入AI助手页面
+import AgentsHome from './chatAgents/pages/AgentsHome';
+import CodeReviewAgent from './chatAgents/pages/CodeReviewAgent';
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -30,6 +34,10 @@ const App: React.FC = () => {
 
           {/* 生成器 */}
           <Route path="/tools/random-generator" element={<RandomGeneratorPage />} />
+
+          {/* AI助手 */}
+          <Route path="/agents" element={<AgentsHome />} />
+          <Route path="/agents/code-review" element={<CodeReviewAgent />} />
 
           {/* 404页面 */}
           <Route path="*" element={<NotFoundPage />} />

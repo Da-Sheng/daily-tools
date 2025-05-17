@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Typography, Badge } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AppstoreOutlined,
@@ -7,6 +7,8 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  RobotOutlined,
+  CodeOutlined,
 } from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -25,6 +27,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const bgColor = '#fff';
   const borderRadius = 8;
 
+  // 检查当前路径是否为代码评审页面
+  const isCodeReviewPage = location.pathname === '/agents/code-review';
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
@@ -38,6 +43,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           left: 0,
           top: 0,
           bottom: 0,
+          zIndex: 10,
         }}
       >
         <div
@@ -93,6 +99,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 },
               ],
             },
+            {
+              key: 'agents',
+              icon: <RobotOutlined />,
+              label: (
+                <span>
+                  AI助手 <Badge count="NEW" size="small" offset={[5, 0]} />
+                </span>
+              ),
+              children: [
+                {
+                  key: '/agents',
+                  icon: <RobotOutlined />,
+                  label: <Link to="/agents">助手中心</Link>,
+                },
+                {
+                  key: '/agents/code-review',
+                  icon: <CodeOutlined />,
+                  label: <Link to="/agents/code-review">代码评审</Link>,
+                },
+              ],
+            },
           ]}
         />
       </Sider>
@@ -118,19 +145,34 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             Daily Tools | 日常工具
           </Title>
         </Header>
-        <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
+        <Content
+          style={{
+            margin: isCodeReviewPage ? 0 : '24px 16px',
+            overflow: 'hidden',
+            height: isCodeReviewPage ? 'calc(100vh - 64px)' : 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: isCodeReviewPage ? 1 : 'unset',
+          }}
+        >
           <div
             style={{
-              padding: 24,
-              minHeight: 360,
+              padding: isCodeReviewPage ? 0 : 24,
+              flex: 1,
               background: bgColor,
-              borderRadius: borderRadius,
+              borderRadius: isCodeReviewPage ? 0 : borderRadius,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              height: isCodeReviewPage ? '100%' : 'auto',
             }}
           >
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>日常工具 ©{new Date().getFullYear()} 创建</Footer>
+        {!isCodeReviewPage && (
+          <Footer style={{ textAlign: 'center' }}>日常工具 ©{new Date().getFullYear()} 创建</Footer>
+        )}
       </Layout>
     </Layout>
   );
