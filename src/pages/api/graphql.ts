@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { GRAPHQL_URL } from '../../api/config';
 
 /**
  * GraphQL API 代理
@@ -19,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // 转发到外部 GraphQL 服务器
-    const response = await fetch('https://api.nizbarkwt.online/graphql', {
+    const response = await fetch(GRAPHQL_URL, {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',

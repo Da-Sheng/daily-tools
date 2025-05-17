@@ -1,7 +1,5 @@
 import { ToolCategory, ToolItem } from '../../types';
-
-// API 基础URL
-const API_BASE_URL = 'https://api.nizbarkwt.online';
+import { API_BASE_URL } from '../config';
 
 // API响应接口
 interface ApiResponse<T> {

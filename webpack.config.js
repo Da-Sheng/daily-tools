@@ -3,8 +3,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
+const Dotenv = require('dotenv-webpack');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// 根据环境选择.env文件
+const envFile = isDevelopment ? '.env.development' : '.env.production';
 
 module.exports = {
   mode: isDevelopment ? 'development' : 'production',
@@ -122,6 +126,15 @@ module.exports = {
       filename: '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css'
     }),
+    // 使用dotenv-webpack插件处理环境变量
+    new Dotenv({
+      path: envFile, // 指定.env文件路径
+      safe: false, // 加载.env.example文件以验证环境变量
+      systemvars: true, // 加载所有系统环境变量
+      silent: false, // 隐藏任何警告
+      defaults: false // 不加载.env.defaults文件
+    }),
+    // 确保NODE_ENV环境变量可用
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
     })
