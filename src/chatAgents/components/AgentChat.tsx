@@ -10,7 +10,7 @@ const { Title, Paragraph, Text } = Typography;
 export interface ChatMessage {
   id: string;
   content: string;
-  sender: 'user' | 'agent';
+  sender: 'user' | 'agent' | 'system';
   timestamp: Date;
 }
 
@@ -20,9 +20,10 @@ export interface AgentChatProps {
   agentDescription: string;
   agentAvatar?: string;
   apiEndpoint: string;
-  onSendMessage?: (message: string) => Promise<string>;
+  onSendMessage: (message: string, onChunk?: (text: string) => void) => Promise<string | void>;
   placeholderText?: string;
   initialMessages?: ChatMessage[];
+  useStreamApi?: boolean;
 }
 
 /**
@@ -37,11 +38,12 @@ const AgentChat: React.FC<AgentChatProps> = ({
   onSendMessage,
   placeholderText = '请输入您的问题...',
   initialMessages = [],
+  useStreamApi = false,
 }) => {
   // 状态管理
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 自动滚动到最新消息
@@ -54,63 +56,79 @@ const AgentChat: React.FC<AgentChatProps> = ({
   // 生成唯一ID
   const generateId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  // 发送消息处理
+  // 处理消息发送
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     // 添加用户消息
     const userMessage: ChatMessage = {
-      id: generateId(),
+      id: `user-${Date.now()}`,
       content: inputValue,
       sender: 'user',
       timestamp: new Date(),
     };
 
+    console.log('AgentChat: 发送消息', inputValue);
+    console.log('AgentChat: useStreamApi =', useStreamApi);
+    console.log('AgentChat: onSendMessage类型 =', typeof onSendMessage);
+
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
-      // 两种使用方式：自定义处理或默认API调用
-      let response;
-      if (onSendMessage) {
-        response = await onSendMessage(inputValue);
-      } else {
-        // 默认API调用逻辑
-        const result = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: inputValue }),
-        });
-        const data = await result.json();
-        response = data.response;
+      // 如果使用流式API
+      if (useStreamApi && onSendMessage) {
+        // 创建一个空的代理回复消息
+        const agentMessageId = `agent-${Date.now()}`;
+        const agentMessage: ChatMessage = {
+          id: agentMessageId,
+          content: '',
+          sender: 'agent',
+          timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, agentMessage]);
+
+        // 处理流式回复
+        const handleChunk = (text: string) => {
+          setMessages(prev =>
+            prev.map(msg => (msg.id === agentMessageId ? { ...msg, content: text } : msg))
+          );
+        };
+
+        await onSendMessage(inputValue, handleChunk);
       }
+      // 使用普通API
+      else if (onSendMessage) {
+        const response = await onSendMessage(inputValue);
 
-      // 添加代理回复
-      const agentMessage: ChatMessage = {
-        id: generateId(),
-        content: response || '抱歉，我无法处理您的请求。',
-        sender: 'agent',
-        timestamp: new Date(),
-      };
+        // 添加代理回复
+        if (response) {
+          const agentMessage: ChatMessage = {
+            id: `agent-${Date.now()}`,
+            content: response,
+            sender: 'agent',
+            timestamp: new Date(),
+          };
 
-      setMessages(prev => [...prev, agentMessage]);
+          setMessages(prev => [...prev, agentMessage]);
+        }
+      }
     } catch (error) {
-      console.error('消息发送错误:', error);
+      console.error('发送消息错误:', error);
 
       // 添加错误消息
       const errorMessage: ChatMessage = {
-        id: generateId(),
-        content: '抱歉，处理您的请求时出现错误。请稍后再试。',
-        sender: 'agent',
+        id: `error-${Date.now()}`,
+        content: '发送消息时出现错误，请稍后再试。',
+        sender: 'system',
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -145,18 +163,26 @@ const AgentChat: React.FC<AgentChatProps> = ({
           renderItem={message => (
             <List.Item
               className={`message-item ${
-                message.sender === 'user' ? 'user-message' : 'agent-message'
+                message.sender === 'user'
+                  ? 'user-message'
+                  : message.sender === 'agent'
+                  ? 'agent-message'
+                  : 'system-message'
               }`}
             >
               <List.Item.Meta
                 avatar={
                   message.sender === 'user' ? (
                     <Avatar icon={<UserOutlined />} />
-                  ) : (
+                  ) : message.sender === 'agent' ? (
                     <Avatar icon={<RobotOutlined />} src={agentAvatar} />
+                  ) : (
+                    <Avatar icon={<RobotOutlined />} />
                   )
                 }
-                title={message.sender === 'user' ? '您' : agentName}
+                title={
+                  message.sender === 'user' ? '您' : message.sender === 'agent' ? agentName : '系统'
+                }
                 description={
                   <div className="message-content">
                     {message.content}
@@ -172,7 +198,7 @@ const AgentChat: React.FC<AgentChatProps> = ({
         <div ref={messagesEndRef} />
 
         {/* 加载指示器 */}
-        {isLoading && (
+        {isSubmitting && (
           <div className="loading-indicator">
             <Spin tip="思考中..." />
           </div>
@@ -187,13 +213,13 @@ const AgentChat: React.FC<AgentChatProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholderText}
           autoSize={{ minRows: 2, maxRows: 6 }}
-          disabled={isLoading}
+          disabled={isSubmitting}
         />
         <Button
           type="primary"
           icon={<SendOutlined />}
           onClick={handleSendMessage}
-          disabled={isLoading || !inputValue.trim()}
+          disabled={isSubmitting || !inputValue.trim()}
           className="send-button"
         >
           发送

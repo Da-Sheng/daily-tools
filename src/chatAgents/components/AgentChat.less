@@ -118,3 +118,44 @@
     align-self: flex-end;
   }
 }
+
+// 系统消息样式
+.system-message {
+  background-color: #f5f5f5;
+
+  .ant-comment-content-author-name {
+    color: #ff4d4f;
+  }
+
+  .message-content {
+    color: #ff4d4f;
+  }
+}
+
+// 流式打字指示器
+.typing-indicator {
+  display: inline-block;
+}
+
+.typing-indicator::after {
+  content: '';
+  animation: typing 1.5s infinite;
+}
+
+@keyframes typing {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+  100% {
+    content: '';
+  }
+}
